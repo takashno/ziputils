@@ -1,3 +1,5 @@
+package takashno;
+
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
@@ -8,7 +10,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class ZipUtils {
+public class UtilZip {
 
     public static void main(String[] args) {
 
