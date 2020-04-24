@@ -67,6 +67,7 @@ public class ZipProcess implements Consumer<ExecuteOption> {
                         System.out.println("from : " + x.toAbsolutePath().toString() + ", out : " + oFile.toAbsolutePath().toString());
                     }
 
+                    // Zip
                     var zipFile = new ZipFile(oFile.toAbsolutePath().toFile(),
                             option.getPassword() != null ? option.getPassword().toCharArray() : null);
                     if (option.getFileNameCharset() != null) {

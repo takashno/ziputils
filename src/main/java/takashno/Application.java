@@ -6,6 +6,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import takashno.bean.Distribution;
 import takashno.bean.ExecuteOption;
+import takashno.process.UnZipProcess;
 import takashno.process.ZipProcess;
 import takashno.type.Args;
 import takashno.type.ExitCode;
@@ -96,19 +97,18 @@ public class Application {
                 }
             }
 
+            // Resolve output root directory.
+            if (executeOption.getOutput() == null) {
+                System.out.println("output root directory is designation.use '" + System.getProperty("user.dir") + File.separator + "dist' instead.");
+                executeOption.setOutput(System.getProperty("user.dir") + File.separator + "dist");
+            }
+
             // Call Process.
             try {
                 if (mode == Mode.ZIP) {
-
-                    if (executeOption.getOutput() == null) {
-                        System.out.println("output root directory is designation.use '" + System.getProperty("user.dir") + File.separator + "dist' instead.");
-                        executeOption.setOutput(System.getProperty("user.dir") + File.separator + "dist");
-                    }
-
                     new ZipProcess().accept(executeOption);
-                    System.out.println("call zip.");
                 } else if (mode == Mode.UNZIP) {
-                    System.out.println("call unzip.");
+                    new UnZipProcess().accept(executeOption);
                 }
             } catch (Exception e) {
                 System.out.println("Process Error Occurred...");
