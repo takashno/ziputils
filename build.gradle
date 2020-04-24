@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'maven'
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
 }
 
 group = 'com.zomu.t'
@@ -23,4 +24,33 @@ dependencies {
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
     compileOnly 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
+}
+
+jar {
+    manifest {
+        attributes "Main-Class" : "takashno.Application"
+    }
+}
+
+shadowJar {
+    archiveName ='ziputils.jar'
+}
+
+task copyJar(type: Copy, dependsOn: shadowJar) {
+    from 'build/libs'
+    into 'build/release/libs'
+    includeEmptyDirs = false
+}
+
+task copyScript(type: Copy, dependsOn: copyJar) {
+    from "$projectDir/src/main/script"
+    into 'build/release/bin'
+    includeEmptyDirs = false
+}
+
+task createMaterial(type: Zip, dependsOn: copyScript) {
+    archiveName('ziputils.zip')
+    from 'build/release'
+    include '**/*.*'
+    destinationDir file("build/material")
 }

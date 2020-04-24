@@ -72,9 +72,8 @@ public class UnZipProcess implements Consumer<ExecuteOption> {
                         zipFile.setPassword(option.getPassword() != null ? option.getPassword().toCharArray() : null);
                     }
                     zipFile.extractAll(oParent);
-
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
 
             });
