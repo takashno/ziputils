@@ -27,7 +27,7 @@ Jarからの実行方法は、Javaコマンドによる実行を行う。
 jar -jar ziputils.jar [OPTIONS]
 ```
 
-[こちら](https://github.com/takashno/ziputils/releases) に多少使いやすいように、実行するシェルなどのスクリプトを用意しています。  
+[こちら](https://github.com/takashno/ziputils/releases/tag/0.0.1) に多少使いやすいように、実行するシェルなどのスクリプトを用意しています。  
 Jarから実行したくない場合は参照ください。
 
 #### オプション
