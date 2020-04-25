@@ -3,7 +3,9 @@ package takashno.process;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.model.enums.EncryptionMethod;
+import takashno.bean.FailureFile;
 import takashno.bean.ExecuteOption;
+import takashno.exception.UnZipFailureException;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +14,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 public class UnZipProcess implements Consumer<ExecuteOption> {
@@ -25,12 +28,17 @@ public class UnZipProcess implements Consumer<ExecuteOption> {
         }
         zipParameters.setEncryptionMethod(EncryptionMethod.ZIP_STANDARD);
 
+        var errors = new ArrayList<FailureFile>();
+
         try {
             var inputRootDir = Paths.get(option.getInput());
             var outputRootDir = Paths.get(option.getOutput());
             FileSystem fs = FileSystems.getDefault();
             PathMatcher matcher = fs.getPathMatcher("glob:**/*.zip");
-            Files.walk(inputRootDir).filter(matcher::matches).forEach(x -> {
+
+            var depth = option.isRecursive() ? Integer.MAX_VALUE : 1;
+
+            Files.walk(inputRootDir, depth).filter(matcher::matches).forEach(x -> {
                 var targetFileName = x.getFileName().toString();
                 // 対象ファイルの親ディレクトリ
                 var iParent = x.getParent().toAbsolutePath().toString();
@@ -73,12 +81,16 @@ public class UnZipProcess implements Consumer<ExecuteOption> {
                     }
                     zipFile.extractAll(oParent);
                 } catch (Exception e) {
-                    throw new RuntimeException(e);
+                    errors.add(new FailureFile(x, e));
                 }
 
             });
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+
+        if (!errors.isEmpty()) {
+            throw new UnZipFailureException(errors);
         }
     }
 }

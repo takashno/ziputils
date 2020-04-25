@@ -6,6 +6,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import takashno.bean.Distribution;
 import takashno.bean.ExecuteOption;
+import takashno.exception.UnZipFailureException;
+import takashno.exception.ZipFailureException;
 import takashno.process.UnZipProcess;
 import takashno.process.ZipProcess;
 import takashno.type.Args;
@@ -43,6 +45,7 @@ public class Application {
             if (Stream.of(Args.values()).filter(Args::isRequired).anyMatch(x -> !cmd.hasOption(x.getShortName()))) {
                 System.out.println("Argument Error Occurred...");
                 helpFormatter.printHelp("ziputils -m [MODE] -i [INPUT] [OPTION]...", OPS);
+                System.out.println("failure.");
                 System.exit(ExitCode.ERROR.getValue());
             }
 
@@ -54,6 +57,7 @@ public class Application {
                 System.out.println("Argument Error Occurred... [MODE] value is invalid : "
                         + cmd.getOptionValue(Args.MODE.getShortName()));
                 helpFormatter.printHelp("ziputils -m [MODE] -i [INPUT] [OPTION]...", OPS);
+                System.out.println("failure.");
                 System.exit(ExitCode.ERROR.getValue());
             }
 
@@ -110,9 +114,28 @@ public class Application {
                 } else if (mode == Mode.UNZIP) {
                     new UnZipProcess().accept(executeOption);
                 }
+            } catch (UnZipFailureException uzfe) {
+                System.out.println("***********************************************");
+                System.out.println("unzip process error occurred...");
+                System.out.println("***********************************************");
+                System.out.println("unzip failure files is this.");
+                uzfe.getFailures().forEach(x->System.out.println(x.getPath().toAbsolutePath().toString()));
+                System.out.println("failure.");
+                System.exit(ExitCode.ERROR.getValue());
+            } catch (ZipFailureException zfe) {
+                System.out.println("***********************************************");
+                System.out.println("zip process error occurred...");
+                System.out.println("***********************************************");
+                System.out.println("unzip failure files is this.");
+                zfe.getFailures().forEach(x->System.out.println(x.getPath().toAbsolutePath().toString()));
+                System.out.println("failure.");
+                System.exit(ExitCode.ERROR.getValue());
             } catch (Exception e) {
-                System.out.println("Process Error Occurred...");
+                System.out.println("***********************************************");
+                System.out.println("process error occurred...");
+                System.out.println("***********************************************");
                 e.printStackTrace();
+                System.out.println("failure.");
                 System.exit(ExitCode.ERROR.getValue());
             }
 
@@ -120,8 +143,9 @@ public class Application {
             System.exit(ExitCode.NORMAL.getValue());
 
         } catch (ParseException e) {
-            System.out.println("Argument Error Occurred...");
+            System.out.println("argument error occurred...");
             helpFormatter.printHelp("ziputils -m [MODE] -i [INPUT] [OPTION]...", OPS);
+            System.out.println("failure.");
             System.exit(ExitCode.ERROR.getValue());
         }
 

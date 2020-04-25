@@ -27,8 +27,12 @@ public class ZipProcess implements Consumer<ExecuteOption> {
         try {
             var inputRootDir = Paths.get(option.getInput());
             var outputRootDir = Paths.get(option.getOutput());
-            Files.walk(inputRootDir).forEach(x -> {
-                if (!Files.isDirectory(x)) {
+
+            var depth = option.isRecursive() ? Integer.MAX_VALUE : 1;
+
+            Files.walk(inputRootDir, depth).forEach(x -> {
+                if (!Files.isDirectory(x) && !x.getFileName().endsWith("zip")) {
+
                     var targetFileName = x.getFileName().toString();
                     // 出力ファイル名
                     var oFileName = targetFileName.substring(0, targetFileName.indexOf(".")) + ".zip";
